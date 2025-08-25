@@ -15,7 +15,7 @@ function lc_enqueue_scripts() {
     // Vue desde CDN
     wp_enqueue_script(
         'vuejs',
-        'https://unpkg.com/vue@3/dist/vue.global.prod.js',
+        'https://unpkg.com/vue@3/dist/vue.global.js',
         [],
         null,
         true
