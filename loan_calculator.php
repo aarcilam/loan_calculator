@@ -12,13 +12,13 @@ if (!defined('ABSPATH')) {
 
 // Registrar scripts
 function lc_enqueue_scripts() {
-    // Vue desde CDN
+    // Vue desde CDN (versión de producción)
     wp_enqueue_script(
         'vuejs',
-        'https://unpkg.com/vue@3/dist/vue.global.js',
+        'https://unpkg.com/vue@3/dist/vue.global.prod.js',
         [],
-        null,
-        true
+        '3.0.0',
+        false // Cargar en el head para asegurar que esté disponible
     );
 
     // Nuestro script
@@ -27,7 +27,7 @@ function lc_enqueue_scripts() {
         plugin_dir_url(__FILE__) . 'js/app.js',
         ['vuejs'],
         '1.0',
-        true
+        true // Cargar en el footer
     );
 }
 add_action('wp_enqueue_scripts', 'lc_enqueue_scripts');
