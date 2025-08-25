@@ -4,66 +4,263 @@ document.addEventListener('DOMContentLoaded', function() {
   createApp({
     data() {
       return {
-        amount: 10000,
-        rate: 5,
-        years: 1,
+        // Tipo de simulación
+        tipoSimulacion: 'monto-a-cuota', // 'monto-a-cuota' o 'cuota-a-monto'
+
+        // Valores de entrada (modificables por el cliente)
+        montoDesembolso: 10000000,
+        cuota: 277133,
+        plazoMeses: 144,
+
+        // Valores fijos (parte de la fórmula)
+        tasa: 1.80,
+        seguroVida: 1500,
+        afiliacion: 200000,
+        aporte: 20000,
+        fianza: 7.0,
+        corretaje: 6.0,
+        interesesAnticipados: 3.6,
+        impuesto4x1000: 0.4,
+
+        // Límites
+        montoMin: 1000000,
+        montoMax: 50000000,
+        cuotaMin: 50000,
+        cuotaMax: 1000000,
+        plazoMin: 12,
+        plazoMax: 180
       };
     },
     computed: {
-      monthlyPayment() {
-        const principal = this.amount;
-        const monthlyRate = this.rate / 100 / 12;
-        const numberOfPayments = this.years * 12;
+      // Valores comunes
+      totalCostosAlFrente() {
+        return this.fianza + this.corretaje + this.interesesAnticipados + this.impuesto4x1000;
+      },
 
-        if (monthlyRate === 0) {
-          return (principal / numberOfPayments).toFixed(2);
+      // Cálculos para MONTO A CUOTA
+      montoTotal() {
+        if (this.tipoSimulacion === 'monto-a-cuota') {
+          const montoDesembolso = this.montoDesembolso;
+          const costosAlFrente = this.totalCostosAlFrente;
+          const afiliacion = this.afiliacion;
+
+          if (costosAlFrente >= 100) return 0;
+
+          return (montoDesembolso * 1.0) / (1 - (costosAlFrente / 100)) + afiliacion;
+        }
+        return 0;
+      },
+      cuotaCalculada() {
+        if (this.tipoSimulacion === 'monto-a-cuota') {
+          const tasa = this.tasa;
+          const plazo = this.plazoMeses;
+          const montoTotal = this.montoTotal;
+          const seguroVida = this.seguroVida;
+          const aporte = this.aporte;
+
+          const tasaMensual = tasa / 100 ;
+
+          if (tasaMensual === 0) {
+            return Math.round((montoTotal / plazo) + ((seguroVida * montoTotal) / 1000000) + aporte);
+          }
+
+          const pmt = this.pmt(tasaMensual, plazo, -montoTotal);
+          const seguroProporcional = (seguroVida * montoTotal) / 1000000;
+
+          return Math.round(pmt + seguroProporcional + aporte);
+        }
+        return 0;
+      },
+
+      // Cálculos para CUOTA A MONTO
+      factorPorMillon() {
+        const tasaMensual = this.tasa / 100 ;
+        const plazo = this.plazoMeses;
+      
+        if (tasaMensual === 0) return this.seguroVida;
+      
+        const cuotaMillon = (1000000 * tasaMensual) / (1 - Math.pow(1 + tasaMensual, -plazo));
+        return Math.round(cuotaMillon + this.seguroVida);
+      },
+      montoTotalCalculado() {
+        if (this.tipoSimulacion === 'cuota-a-monto') {
+          const factor = this.factorPorMillon;
+          const cuota = this.cuota;
+
+          if (factor === 0) return 0;
+
+          return Math.round((cuota * 1000000) / factor);
+        }
+        return 0;
+      },
+      montoDesembolsable() {
+        if (this.tipoSimulacion === 'cuota-a-monto') {
+          const montoTotal = this.montoTotalCalculado;
+          const costosAlFrente = this.totalCostosAlFrente;
+
+          if (costosAlFrente >= 100) return 0;
+
+          return Math.round((montoTotal * (100 - costosAlFrente) / 100) - this.afiliacion);
+        }
+        return 0;
+      }
+    },
+    methods: {
+      pmt(rate, nper, pv, fv = 0, type = 0) {
+        if (rate === 0) return -(pv + fv) / nper;
+
+        const pvif = Math.pow(1 + rate, nper);
+        let pmt = -rate * (pv * pvif + fv) / (pvif - 1);
+
+        if (type === 1) {
+          pmt /= (1 + rate);
         }
 
-        const payment =
-          (principal * monthlyRate) /
-          (1 - Math.pow(1 + monthlyRate, -numberOfPayments));
-
-        return payment.toFixed(2);
+        return pmt;
       },
+      cambiarSimulacion(tipo) {
+        this.tipoSimulacion = tipo;
+        // Resetear valores según el tipo
+        if (tipo === 'monto-a-cuota') {
+          this.montoDesembolso = 10000000;
+        } else {
+          this.cuota = 277133;
+        }
+        this.plazoMeses = 144;
+      },
+      actualizarMonto(valor) {
+        this.montoDesembolso = Math.max(this.montoMin, Math.min(this.montoMax, parseInt(valor) || 0));
+      },
+      actualizarCuota(valor) {
+        this.cuota = Math.max(this.cuotaMin, Math.min(this.cuotaMax, parseInt(valor) || 0));
+      },
+      actualizarPlazo(valor) {
+        this.plazoMeses = Math.max(this.plazoMin, Math.min(this.plazoMax, parseInt(valor) || 0));
+      },
+      formatearMoneda(valor) {
+        const numValor = parseFloat(valor);
+        if (isNaN(numValor)) return '$0';
+
+        return new Intl.NumberFormat('es-CO', {
+          style: 'currency',
+          currency: 'COP',
+          minimumFractionDigits: 0
+        }).format(numValor);
+      },
+      crearSlider(label, model, min, max, onChange, formatear = true) {
+        return h('div', { style: 'margin-bottom:1.5rem;' }, [
+          h('label', { style: 'display:block; margin-bottom:0.5rem; color:#555; font-weight:bold;' }, label),
+          h('div', { style: 'display:flex; align-items:center; gap:1rem;' }, [
+            h('span', { style: 'color:#666; font-size:0.9rem; min-width:80px;' },
+              formatear ? this.formatearMoneda(min) : `${min}`
+            ),
+            h('input', {
+              type: 'range',
+              min: min,
+              max: max,
+              value: this[model],
+              onInput: (e) => onChange(parseInt(e.target.value)),
+              style: 'flex:1; height:6px; background:#ddd; border-radius:3px; outline:none;'
+            }),
+            h('input', {
+              type: 'number',
+              value: this[model],
+              onInput: (e) => onChange(parseInt(e.target.value)),
+              style: 'width:150px; padding:0.5rem; border:1px solid #ddd; border-radius:4px; text-align:center; font-size:1rem;'
+            }),
+            h('span', { style: 'color:#666; font-size:0.9rem; min-width:80px;' },
+              formatear ? this.formatearMoneda(max) : `${max}`
+            )
+          ])
+        ]);
+      },
+      crearResultado(label, valor, destacado = false) {
+        return h('div', {
+          style: `display:flex; justify-content:space-between; align-items:center; padding:1rem; margin-bottom:0.5rem; border-radius:6px; ${destacado ? 'background:#fff3cd; border:2px solid #ffc107;' : 'background:#e8f5e8;'}`
+        }, [
+          h('span', { style: `font-weight:bold; ${destacado ? 'color:#856404;' : 'color:#2e7d32;'}` }, label),
+          h('span', { style: `font-weight:bold; ${destacado ? 'color:#856404;' : 'color:#2e7d32;'}` },
+            typeof valor === 'number' ? this.formatearMoneda(valor) : valor
+          )
+        ]);
+      }
     },
     render() {
       return h('div', {
-        class: 'loan-calculator',
-        style: 'max-width:400px; padding:1rem; border:1px solid #ddd; border-radius:8px;'
+        class: 'simulador-credito',
+        style: 'max-width:1200px; margin:0 auto; padding:2rem; background:#f8f9fa; border-radius:12px; font-family:Arial,sans-serif;'
       }, [
-        h('h3', 'Calculadora de Préstamos'),
-        h('label', [
-          'Monto: ',
-          h('input', {
-            type: 'number',
-            value: this.amount,
-            onInput: (e) => this.amount = parseFloat(e.target.value) || 0
-          })
+        // Header
+        h('h1', {
+          style: 'color:#ff6b35; text-align:center; margin-bottom:0.5rem; font-size:2.5rem;'
+        }, 'Simulador de Crédito'),
+        h('p', {
+          style: 'text-align:center; color:#666; margin-bottom:2rem; font-size:1.1rem;'
+        }, 'Simule monto a cuota o cuota a monto en tiempo real'),
+
+        // Selector de tipo de simulación
+        h('div', { style: 'background:white; padding:1.5rem; border-radius:8px; margin-bottom:1.5rem; text-align:center;' }, [
+          h('h3', { style: 'color:#333; margin-bottom:1rem;' }, 'Tipo de Simulación:'),
+          h('div', { style: 'display:flex; gap:1rem; justify-content:center;' }, [
+            h('button', {
+              onClick: () => this.cambiarSimulacion('monto-a-cuota'),
+              style: `padding:0.75rem 1.5rem; border:none; border-radius:6px; font-size:1rem; font-weight:bold; cursor:pointer; ${this.tipoSimulacion === 'monto-a-cuota' ? 'background:#ff6b35; color:white;' : 'background:#e9ecef; color:#495057;'}`
+            }, 'MONTO A CUOTA'),
+            h('button', {
+              onClick: () => this.cambiarSimulacion('cuota-a-monto'),
+              style: `padding:0.75rem 1.5rem; border:none; border-radius:6px; font-size:1rem; font-weight:bold; cursor:pointer; ${this.tipoSimulacion === 'cuota-a-monto' ? 'background:#ff6b35; color:white;' : 'background:#e9ecef; color:#495057;'}`
+            }, 'CUOTA A MONTO')
+          ])
         ]),
-        h('br'),
-        h('br'),
-        h('label', [
-          'Tasa de interés (%): ',
-          h('input', {
-            type: 'number',
-            step: '0.1',
-            value: this.rate,
-            onInput: (e) => this.rate = parseFloat(e.target.value) || 0
-          })
+
+        // Parámetros de entrada
+        h('div', { style: 'background:white; padding:1.5rem; border-radius:8px; margin-bottom:1.5rem;' }, [
+          h('h3', { style: 'color:#333; margin-bottom:1rem;' }, 'Parámetros de Entrada:'),
+
+          this.tipoSimulacion === 'monto-a-cuota'
+            ? this.crearSlider('Monto Desembolso *', 'montoDesembolso', this.montoMin, this.montoMax, this.actualizarMonto.bind(this))
+            : this.crearSlider('Cuota *', 'cuota', this.cuotaMin, this.cuotaMax, this.actualizarCuota.bind(this)),
+
+          this.crearSlider('Plazo (meses) *', 'plazoMeses', this.plazoMin, this.plazoMax, this.actualizarPlazo.bind(this), false)
         ]),
-        h('br'),
-        h('br'),
-        h('label', [
-          'Años: ',
-          h('input', {
-            type: 'number',
-            value: this.years,
-            onInput: (e) => this.years = parseFloat(e.target.value) || 0
-          })
+
+        // Resultados principales
+        h('div', { style: 'background:white; padding:1.5rem; border-radius:8px; margin-bottom:1.5rem;' }, [
+          h('h3', { style: 'color:#333; margin-bottom:1rem;' }, 'Resultados de la Simulación:'),
+
+          this.tipoSimulacion === 'monto-a-cuota'
+            ? [
+                this.crearResultado('Monto Total', this.montoTotal, true),
+                this.crearResultado('Cuota Calculada', this.cuotaCalculada, true)
+              ]
+            : [
+                this.crearResultado('Factor por Millón', this.factorPorMillon, true),
+                this.crearResultado('Monto Total', this.montoTotalCalculado, true),
+                this.crearResultado('Monto Desembolsable', this.montoDesembolsable, true)
+              ]
         ]),
-        h('br'),
-        h('br'),
-        h('h4', `Pago mensual: $${this.monthlyPayment}`)
+
+        // Detalle de costos
+        h('div', { style: 'background:white; padding:1.5rem; border-radius:8px;' }, [
+          h('h3', { style: 'color:#333; margin-bottom:1rem;' }, 'Detalle de Costos:'),
+
+          h('div', { style: 'display:grid; grid-template-columns:1fr 1fr; gap:1rem;' }, [
+            h('div', [
+              this.crearResultado('Tasa de Interés', `${this.tasa}%`),
+              this.crearResultado('Seguro de Vida', this.formatearMoneda(this.seguroVida)),
+              this.crearResultado('Afiliación', this.formatearMoneda(this.afiliacion)),
+              this.crearResultado('Aporte', this.formatearMoneda(this.aporte))
+            ]),
+            h('div', [
+              this.crearResultado('Fianza', `${this.fianza}%`),
+              this.crearResultado('Corretaje', `${this.corretaje}%`),
+              this.crearResultado('Intereses Anticipados', `${this.interesesAnticipados}%`),
+              this.crearResultado('4x1000', `${this.impuesto4x1000}%`)
+            ])
+          ]),
+
+          this.crearResultado('Total Costos al Frente', `${this.totalCostosAlFrente}%`)
+        ])
       ]);
     }
   }).mount("#loan-calculator");

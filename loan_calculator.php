@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: Loan Calculator
- * Description: Pequeña calculadora de préstamos con Vue.js inyectada por shortcode.
+ * Plugin Name: Simulador de Crédito con Fórmulas Excel
+ * Description: Simulador avanzado que usa las fórmulas exactas de Excel para monto a cuota y cuota a monto.
  * Version: 1.0
  * Author: Tu Nombre
  */
@@ -34,6 +34,18 @@ add_action('wp_enqueue_scripts', 'lc_enqueue_scripts');
 
 // Shortcode
 function lc_shortcode() {
-    return '<div id="loan-calculator"></div>';
+    // Generar nonce único para este shortcode
+    $nonce = wp_create_nonce('loan_calculator_nonce');
+    
+    return sprintf(
+        '<div id="loan-calculator" data-nonce="%s"></div>',
+        esc_attr($nonce)
+    );
 }
 add_shortcode('loan_calculator', 'lc_shortcode');
+
+// Agregar meta tag para CSP
+function lc_add_csp_meta() {
+    echo '<meta http-equiv="Content-Security-Policy" content="script-src \'self\' \'unsafe-inline\' https://unpkg.com; style-src \'self\' \'unsafe-inline\';" />';
+}
+add_action('wp_head', 'lc_add_csp_meta');
