@@ -184,12 +184,58 @@ document.addEventListener('DOMContentLoaded', function () {
             typeof valor === 'number' ? this.formatearMoneda(valor) : valor
           )
         ]);
+      },
+      generarFilasAmortizacion() {
+        const montoTotal = this.montoTotal;
+        const cuota = this.cuotaCalculada;
+        const tasaMensual = this.tasa / 100;
+        const plazo = this.plazoMeses;
+        const seguroVida = +this.seguroVida * montoTotal / 1000000;
+        const aporte = 0;
+
+        let saldo = montoTotal;
+        const filas = [];
+
+        for (let i = 0; i <= plazo; i++) {
+          let interes = 0;
+          if (saldo>0.9 && i>0) {
+            interes = Math.round(saldo * tasaMensual);
+          }
+          const capital = Math.round(cuota - interes - seguroVida - aporte);
+          const saldoAnterior = saldo;
+          if (i>0) {
+            saldo = Math.round(saldoAnterior - capital);
+          }
+
+          if (i>0) {
+          filas.push({
+            item: i,
+            cuota: cuota,
+            interes: interes,
+            capital: capital,
+            seguroVida: seguroVida,
+            aporte: aporte,
+            saldo: saldo
+          });
+          }else{
+            filas.push({
+              item: i,
+              cuota: 0,
+              interes: 0,
+              capital: 0,
+              seguroVida: 0,
+              aporte: 0,
+              saldo: saldo
+            });
+          }
+        }
+        return filas;
       }
     },
     render() {
       return h('div', {
         class: 'simulador-credito',
-        style: 'max-width:1200px; margin:0 auto; padding:2rem; background:#f8f9fa; border-radius:12px; font-family:Arial,sans-serif;'
+        style: 'width:100%; margin:0 auto; padding:2rem; background:#f8f9fa; border-radius:12px; font-family:Arial,sans-serif;'
       }, [
         // Header
         h('h1', {
@@ -242,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ]),
 
         // Detalle de costos
-        h('div', { style: 'background:white; padding:1.5rem; border-radius:8px;' }, [
+        h('div', { style: 'background:white; padding:1.5rem; border-radius:8px; margin-bottom:1.5rem;' }, [
           h('h3', { style: 'color:#333; margin-bottom:1rem;' }, 'Detalle de Costos:'),
 
           h('div', { style: 'display:grid; grid-template-columns:1fr 1fr; gap:1rem;' }, [
@@ -261,6 +307,42 @@ document.addEventListener('DOMContentLoaded', function () {
           ]),
 
           this.crearResultado('Total Costos al Frente', `${this.totalCostosAlFrente}%`)
+        ]),
+
+        // Tabla de Amortización
+        h('div', { style: 'background:white; padding:1.5rem; border-radius:8px;' }, [
+          h('h3', { style: 'color:#333; margin-bottom:1rem;' }, 'Tabla de Amortización:'),
+          
+          h('div', { style: 'overflow-x:auto;' }, [
+            h('table', {
+              style: 'width:100%; border-collapse:collapse; border:1px solid #ddd; font-size:0.9rem;'
+            }, [
+              // Encabezados de la tabla
+              h('thead', [
+                h('tr', { style: 'background:#f8f9fa;' }, [
+                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#333;' }, 'ITEM'),
+                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#333;' }, 'CUOTA'),
+                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#333;' }, 'INTERES'),
+                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#333;' }, 'CAPITAL'),
+                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#333;' }, 'SEGURO DE VIDA'),
+                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#333;' }, 'APORTE'),
+                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#333;' }, 'SALDO')
+                ])
+              ]),
+              // Cuerpo de la tabla
+              h('tbody', this.generarFilasAmortizacion().map(fila => 
+                h('tr', { style: 'border-bottom:1px solid #eee;' }, [
+                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#666;' }, fila.item),
+                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#2e7d32; font-weight:bold;' }, this.formatearMoneda(fila.cuota)),
+                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#d32f2f;' }, this.formatearMoneda(fila.interes)),
+                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#1976d2;' }, this.formatearMoneda(fila.capital)),
+                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#f57c00;' }, this.formatearMoneda(fila.seguroVida)),
+                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#7b1fa2;' }, this.formatearMoneda(fila.aporte)),
+                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#333; font-weight:bold;' }, this.formatearMoneda(fila.saldo))
+                ])
+              ))
+            ])
+          ])
         ])
       ]);
     }
