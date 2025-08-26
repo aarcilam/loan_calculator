@@ -7,6 +7,10 @@ document.addEventListener('DOMContentLoaded', function () {
         // Tipo de simulación
         tipoSimulacion: 'monto-a-cuota', // 'monto-a-cuota' o 'cuota-a-monto'
 
+        // Estados de visibilidad
+        detalleCostosVisible: false,
+        tablaAmortizacionVisible: false,
+
         // Valores de entrada (modificables por el cliente)
         montoDesembolso: 10000000,
         cuota: 262641,
@@ -124,10 +128,18 @@ document.addEventListener('DOMContentLoaded', function () {
         // Resetear valores según el tipo
         if (tipo === 'monto-a-cuota') {
           this.montoDesembolso = 10000000;
+          this.tablaAmortizacionVisible = false;
         } else {
           this.cuota = 262641;
+          this.tablaAmortizacionVisible = false;
         }
         this.plazoMeses = 144;
+      },
+      alternarDetalleCostos() {
+        this.detalleCostosVisible = !this.detalleCostosVisible;
+      },
+      alternarTablaAmortizacion() {
+        this.tablaAmortizacionVisible = !this.tablaAmortizacionVisible;
       },
       actualizarMonto(valor) {
         this.montoDesembolso = Math.max(this.montoMin, Math.min(this.montoMax, parseInt(valor) || 0));
@@ -177,10 +189,10 @@ document.addEventListener('DOMContentLoaded', function () {
       },
       crearResultado(label, valor, destacado = false) {
         return h('div', {
-          style: `display:flex; justify-content:space-between; align-items:center; padding:1rem; margin-bottom:0.5rem; border-radius:6px; ${destacado ? 'background:#fff3cd; border:2px solid #ffc107;' : 'background:#e8f5e8;'}`
+          style: `display:flex; justify-content:space-between; align-items:center; padding:1rem; margin-bottom:0.5rem; border-radius:6px; ${destacado ? 'background:#e8f4f8; border:2px solid #528A93;' : 'background:#f0f4f8;'}`
         }, [
-          h('span', { style: `font-weight:bold; ${destacado ? 'color:#856404;' : 'color:#2e7d32;'}` }, label),
-          h('span', { style: `font-weight:bold; ${destacado ? 'color:#856404;' : 'color:#2e7d32;'}` },
+          h('span', { style: `font-weight:bold; ${destacado ? 'color:#24334B;' : 'color:#24334B;'}` }, label),
+          h('span', { style: `font-weight:bold; ${destacado ? 'color:#24334B;' : 'color:#24334B;'}` },
             typeof valor === 'number' ? this.formatearMoneda(valor) : valor
           )
         ]);
@@ -249,11 +261,11 @@ document.addEventListener('DOMContentLoaded', function () {
     render() {
       return h('div', {
         class: 'simulador-credito',
-        style: 'width:100%; margin:0 auto; padding:2rem; background:#f8f9fa; border-radius:12px; font-family:Arial,sans-serif;'
+        style: 'width:100%; margin:0 auto; padding:2rem; background:#f5f7fa; border-radius:12px; font-family:Arial,sans-serif;'
       }, [
         // Header
         h('h1', {
-          style: 'color:#ff6b35; text-align:center; margin-bottom:0.5rem; font-size:2.5rem;'
+          style: 'color:#24334B; text-align:center; margin-bottom:0.5rem; font-size:2.5rem;'
         }, 'Simulador de Crédito'),
         h('p', {
           style: 'text-align:center; color:#666; margin-bottom:2rem; font-size:1.1rem;'
@@ -265,11 +277,11 @@ document.addEventListener('DOMContentLoaded', function () {
           h('div', { style: 'display:flex; gap:1rem; justify-content:center;' }, [
             h('button', {
               onClick: () => this.cambiarSimulacion('monto-a-cuota'),
-              style: `padding:0.75rem 1.5rem; border:none; border-radius:6px; font-size:1rem; font-weight:bold; cursor:pointer; ${this.tipoSimulacion === 'monto-a-cuota' ? 'background:#ff6b35; color:white;' : 'background:#e9ecef; color:#495057;'}`
+              style: `padding:0.75rem 1.5rem; border:none; border-radius:6px; font-size:1rem; font-weight:bold; cursor:pointer; ${this.tipoSimulacion === 'monto-a-cuota' ? 'background:#528A93; color:white;' : 'background:#e9ecef; color:#495057;'}`
             }, 'MONTO A CUOTA'),
             h('button', {
               onClick: () => this.cambiarSimulacion('cuota-a-monto'),
-              style: `padding:0.75rem 1.5rem; border:none; border-radius:6px; font-size:1rem; font-weight:bold; cursor:pointer; ${this.tipoSimulacion === 'cuota-a-monto' ? 'background:#ff6b35; color:white;' : 'background:#e9ecef; color:#495057;'}`
+              style: `padding:0.75rem 1.5rem; border:none; border-radius:6px; font-size:1rem; font-weight:bold; cursor:pointer; ${this.tipoSimulacion === 'cuota-a-monto' ? 'background:#528A93; color:white;' : 'background:#e9ecef; color:#495057;'}`
             }, 'CUOTA A MONTO')
           ])
         ]),
@@ -295,7 +307,7 @@ document.addEventListener('DOMContentLoaded', function () {
               this.crearResultado('Cuota Calculada', this.cuotaCalculada, true)
             ]
             : [
-              this.crearResultado('Factor por Millón', this.factorPorMillon, true),
+              // this.crearResultado('Factor por Millón', this.factorPorMillon, true),
               this.crearResultado('Monto Total', this.montoTotalCalculado, true),
               this.crearResultado('Monto Desembolsable', this.montoDesembolsable, true)
             ]
@@ -303,61 +315,89 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Detalle de costos
         h('div', { style: 'background:white; padding:1.5rem; border-radius:8px; margin-bottom:1.5rem;' }, [
-          h('h3', { style: 'color:#333; margin-bottom:1rem;' }, 'Detalle de Costos:'),
-
-          h('div', { style: 'display:grid; grid-template-columns:1fr 1fr; gap:1rem;' }, [
-            h('div', [
-              this.crearResultado('Tasa de Interés', `${this.tasa}%`),
-              this.crearResultado('Seguro de Vida', this.formatearMoneda(this.seguroVida)),
-              this.crearResultado('Afiliación', this.formatearMoneda(this.afiliacion)),
-              this.crearResultado('Aporte', this.formatearMoneda(this.aporte))
-            ]),
-            h('div', [
-              this.crearResultado('Fianza', `${this.fianza}%`),
-              this.crearResultado('Corretaje', `${this.corretaje}%`),
-              this.crearResultado('Intereses Anticipados', `${this.interesesAnticipados}%`),
-              this.crearResultado('4x1000', `${this.impuesto4x1000}%`)
-            ])
+          h('div', {
+            style: 'display:flex; justify-content:space-between; align-items:center; cursor:pointer;',
+            onClick: () => this.alternarDetalleCostos()
+          }, [
+            h('h3', { style: 'color:#333; margin:0;' }, 'Detalle de Costos:'),
+            h('span', {
+              style: 'font-size:1.5rem; color:#666; transition:transform 0.3s;',
+              class: this.detalleCostosVisible ? 'rotated' : ''
+            }, this.detalleCostosVisible ? '-' : '+')
           ]),
 
-          this.crearResultado('Total Costos al Frente', `${this.totalCostosAlFrente}%`)
+          // Contenido del acordeón
+          h('div', {
+            style: `overflow:hidden; transition:all 0.3s ease; ${this.detalleCostosVisible ? 'max-height:1000px; opacity:1;' : 'max-height:0; opacity:0;'}`
+          }, [
+            h('div', { style: 'display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1rem;' }, [
+              h('div', [
+                this.crearResultado('Tasa de Interés', `${this.tasa}%`),
+                this.crearResultado('Seguro de Vida', this.formatearMoneda(this.seguroVida)),
+                this.crearResultado('Afiliación', this.formatearMoneda(this.afiliacion)),
+                this.crearResultado('Aporte', this.formatearMoneda(this.aporte))
+              ]),
+              h('div', [
+                this.crearResultado('Fianza', `${this.fianza}%`),
+                this.crearResultado('Corretaje', `${this.corretaje}%`),
+                this.crearResultado('Intereses Anticipados', `${this.interesesAnticipados}%`),
+                this.crearResultado('4x1000', `${this.impuesto4x1000}%`)
+              ])
+            ]),
+
+            this.crearResultado('Total Costos al Frente', `${this.totalCostosAlFrente}%`)
+          ])
         ]),
 
-        // Tabla de Amortización
-        h('div', { style: 'background:white; padding:1.5rem; border-radius:8px;' }, [
-          h('h3', { style: 'color:#333; margin-bottom:1rem;' }, 'Tabla de Amortización:'),
-          
-          h('div', { style: 'overflow-x:auto;' }, [
-            h('table', {
-              style: 'width:100%; border-collapse:collapse; border:1px solid #ddd; font-size:0.9rem;'
-            }, [
-              // Encabezados de la tabla
-              h('thead', [
-                h('tr', { style: 'background:#f8f9fa;' }, [
-                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#333;' }, 'ITEM'),
-                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#333;' }, 'CUOTA'),
-                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#333;' }, 'INTERES'),
-                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#333;' }, 'CAPITAL'),
-                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#333;' }, 'SEGURO DE VIDA'),
-                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#333;' }, 'APORTE'),
-                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#333;' }, 'SALDO')
-                ])
-              ]),
-              // Cuerpo de la tabla
-              h('tbody', this.generarFilasAmortizacion().map(fila => 
-                h('tr', { style: 'border-bottom:1px solid #eee;' }, [
-                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#666;' }, fila.item),
-                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#2e7d32; font-weight:bold;' }, this.formatearMoneda(fila.cuota)),
-                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#d32f2f;' }, this.formatearMoneda(fila.interes)),
-                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#1976d2;' }, this.formatearMoneda(fila.capital)),
-                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#f57c00;' }, this.formatearMoneda(fila.seguroVida)),
-                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#7b1fa2;' }, this.formatearMoneda(fila.aporte)),
-                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#333; font-weight:bold;' }, this.formatearMoneda(fila.saldo))
-                ])
-              ))
+        // Tabla de Amortización (solo visible en cuota a monto)
+        this.tipoSimulacion === 'cuota-a-monto' ? h('div', { style: 'background:white; padding:1.5rem; border-radius:8px;' }, [
+          h('div', {
+            style: 'display:flex; justify-content:space-between; align-items:center; cursor:pointer;',
+            onClick: () => this.alternarTablaAmortizacion()
+          }, [
+            h('h3', { style: 'color:#333; margin:0;' }, 'Tabla de Amortización:'),
+            h('span', {
+              style: 'font-size:1.5rem; color:#666; transition:transform 0.3s;',
+              class: this.tablaAmortizacionVisible ? 'rotated' : ''
+            }, this.tablaAmortizacionVisible ? '-' : '+')
+          ]),
+
+          // Contenido del acordeón
+          h('div', {
+            style: `overflow:hidden; transition:all 0.3s ease; ${this.tablaAmortizacionVisible ? 'max-height:2000px; opacity:1;' : 'max-height:0; opacity:0;'}`
+          }, [
+            h('div', { style: 'overflow-x:auto; margin-top:1rem;' }, [
+              h('table', {
+                style: 'width:100%; border-collapse:collapse; border:1px solid #ddd; font-size:0.9rem;'
+              }, [
+                // Encabezados de la tabla
+                h('thead', [
+                  h('tr', { style: 'background:#e8f4f8;' }, [
+                                      h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#24334B;' }, 'ITEM'),
+                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#24334B;' }, 'CUOTA'),
+                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#24334B;' }, 'INTERES'),
+                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#24334B;' }, 'CAPITAL'),
+                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#24334B;' }, 'SEGURO DE VIDA'),
+                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:bold; color:#24334B;' }, 'APORTE'),
+                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#24334B;' }, 'SALDO')
+                  ])
+                ]),
+                // Cuerpo de la tabla
+                h('tbody', this.generarFilasAmortizacion().map(fila => 
+                  h('tr', { style: 'border-bottom:1px solid #eee;' }, [
+                    h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#666;' }, fila.item),
+                                      h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#528A93; font-weight:bold;' }, this.formatearMoneda(fila.cuota)),
+                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#24334B;' }, this.formatearMoneda(fila.interes)),
+                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#528A93;' }, this.formatearMoneda(fila.capital)),
+                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#24334B;' }, this.formatearMoneda(fila.seguroVida)),
+                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#528A93;' }, this.formatearMoneda(fila.aporte)),
+                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#24334B; font-weight:bold;' }, this.formatearMoneda(fila.saldo))
+                  ])
+                ))
+              ])
             ])
           ])
-        ])
+        ]) : null
       ]);
     }
   }).mount("#loan-calculator");
