@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
         cuotaMin: 50000,
         cuotaMax: 1000000,
         plazoMin: 12,
-        plazoMax: 180
+        plazoMax: 144
       };
     },
     computed: {
