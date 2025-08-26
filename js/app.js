@@ -77,19 +77,23 @@ document.addEventListener('DOMContentLoaded', function () {
         const tasaMensual = this.tasa / 100;
         const plazo = this.plazoMeses;
 
-        if (tasaMensual === 0) return this.seguroVida;
+        if (tasaMensual === 0) return 0;
 
         const cuotaMillon = (1000000 * tasaMensual) / (1 - Math.pow(1 + tasaMensual, -plazo));
-        return Math.round(cuotaMillon + this.seguroVida);
+        return Math.round(cuotaMillon);
       },
       montoTotalCalculado() {
         if (this.tipoSimulacion === 'cuota-a-monto') {
           const factor = this.factorPorMillon;
           const cuota = this.cuota;
+          const seguroVida = this.seguroVida;
+          const aporte = this.aporte;
 
           if (factor === 0) return 0;
 
-          return Math.round((cuota * 1000000) / factor);
+          // Calculamos el monto total basado en la cuota neta (sin seguro ni aporte)
+          const cuotaNeto = cuota - seguroVida - aporte;
+          return Math.round((cuotaNeto * 1000000) / factor);
         }
         return 0;
       },
@@ -186,11 +190,25 @@ document.addEventListener('DOMContentLoaded', function () {
         ]);
       },
       generarFilasAmortizacion() {
-        const montoTotal = this.montoTotal;
-        const cuota = this.cuotaCalculada;
+        let montoTotal, cuota, seguroVida;
+        
+        if (this.tipoSimulacion === 'monto-a-cuota') {
+          montoTotal = this.montoTotal;
+          cuota = this.cuotaCalculada;
+        } else {
+          montoTotal = this.montoTotalCalculado;
+          cuota = this.cuota;
+        }
+        
+        // Log de depuración
+        console.log('Tipo simulación:', this.tipoSimulacion);
+        console.log('Monto total:', montoTotal);
+        console.log('Cuota:', cuota);
+        console.log('Factor por millón:', this.factorPorMillon);
+        
         const tasaMensual = this.tasa / 100;
         const plazo = this.plazoMeses;
-        const seguroVida = +this.seguroVida * montoTotal / 1000000;
+        seguroVida = +this.seguroVida * montoTotal / 1000000;
         const aporte = 0;
 
         let saldo = montoTotal;
@@ -208,15 +226,15 @@ document.addEventListener('DOMContentLoaded', function () {
           }
 
           if (i>0) {
-          filas.push({
-            item: i,
-            cuota: cuota,
-            interes: interes,
-            capital: capital,
-            seguroVida: seguroVida,
-            aporte: aporte,
-            saldo: saldo
-          });
+            filas.push({
+              item: i,
+              cuota: cuota,
+              interes: interes,
+              capital: capital,
+              seguroVida: seguroVida,
+              aporte: aporte,
+              saldo: saldo
+            });
           }else{
             filas.push({
               item: i,
