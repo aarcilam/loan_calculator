@@ -9,11 +9,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Valores de entrada (modificables por el cliente)
         montoDesembolso: 10000000,
-        cuota: 277133,
+        cuota: 262641,
         plazoMeses: 144,
 
         // Valores fijos (parte de la fórmula)
-        tasa: 1.80,
+        tasa: 1.66,
         seguroVida: 1500,
         afiliacion: 200000,
         aporte: 20000,
@@ -60,10 +60,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
           const tasaMensual = tasa / 100;
 
-          if (tasaMensual === 0) {
-            return Math.round((montoTotal / plazo) + ((seguroVida * montoTotal) / 1000000) + aporte);
-          }
-
           const pmt = this.pmt(tasaMensual, plazo, -montoTotal);
           const seguroProporcional = (seguroVida * montoTotal) / 1000000;
 
@@ -79,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (tasaMensual === 0) return 0;
 
-        const cuotaMillon = (1000000 * tasaMensual) / (1 - Math.pow(1 + tasaMensual, -plazo));
+        const cuotaMillon = (this.pmt(tasaMensual, plazo, -1000000))+this.seguroVida;
         return Math.round(cuotaMillon);
       },
       montoTotalCalculado() {
@@ -92,8 +88,8 @@ document.addEventListener('DOMContentLoaded', function () {
           if (factor === 0) return 0;
 
           // Calculamos el monto total basado en la cuota neta (sin seguro ni aporte)
-          const cuotaNeto = cuota - seguroVida - aporte;
-          return Math.round((cuotaNeto * 1000000) / factor);
+          const cuotaNeto = (cuota/factor)*1000000;
+          return Math.round(cuotaNeto);
         }
         return 0;
       },
@@ -129,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (tipo === 'monto-a-cuota') {
           this.montoDesembolso = 10000000;
         } else {
-          this.cuota = 277133;
+          this.cuota = 262641;
         }
         this.plazoMeses = 144;
       },
