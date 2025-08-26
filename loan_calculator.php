@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: Simulador de Crédito con Fórmulas Excel
- * Description: Simulador avanzado que usa las fórmulas exactas de Excel para monto a cuota y cuota a monto.
+ * Plugin Name: Simulador de Crédito 
+ * Description: Simulador avanzado que usa las fórmulas exactas de Excel para monto a cuota y cuota a monto. Hecho con vue 3 desde cdn.
  * Version: 1.0
- * Author: Tu Nombre
+ * Author: Andres Arcila
  */
 
 if (!defined('ABSPATH')) {
