@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   const { createApp, h } = Vue;
 
   createApp({
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
           const seguroVida = this.seguroVida;
           const aporte = this.aporte;
 
-          const tasaMensual = tasa / 100 ;
+          const tasaMensual = tasa / 100;
 
           if (tasaMensual === 0) {
             return Math.round((montoTotal / plazo) + ((seguroVida * montoTotal) / 1000000) + aporte);
@@ -74,11 +74,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // Cálculos para CUOTA A MONTO
       factorPorMillon() {
-        const tasaMensual = this.tasa / 100 ;
+        const tasaMensual = this.tasa / 100;
         const plazo = this.plazoMeses;
-      
+
         if (tasaMensual === 0) return this.seguroVida;
-      
+
         const cuotaMillon = (1000000 * tasaMensual) / (1 - Math.pow(1 + tasaMensual, -plazo));
         return Math.round(cuotaMillon + this.seguroVida);
       },
@@ -106,18 +106,19 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     },
     methods: {
-      pmt(rate, nper, pv, fv = 0, type = 0) {
-        if (rate === 0) return -(pv + fv) / nper;
+      pmt(rate, nperiod, pv, fv = 0, type = 0) {
+        if (rate == 0) return -(pv + fv) / nperiod;
 
-        const pvif = Math.pow(1 + rate, nper);
-        let pmt = -rate * (pv * pvif + fv) / (pvif - 1);
+        const pvif = Math.pow(1 + rate, nperiod);
+        const pmt = rate / (pvif - 1) * -(pv * pvif + fv);
 
-        if (type === 1) {
+        if (type == 1) {
           pmt /= (1 + rate);
         }
 
         return pmt;
       },
+
       cambiarSimulacion(tipo) {
         this.tipoSimulacion = tipo;
         // Resetear valores según el tipo
@@ -230,14 +231,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
           this.tipoSimulacion === 'monto-a-cuota'
             ? [
-                this.crearResultado('Monto Total', this.montoTotal, true),
-                this.crearResultado('Cuota Calculada', this.cuotaCalculada, true)
-              ]
+              this.crearResultado('Monto Total', this.montoTotal, true),
+              this.crearResultado('Cuota Calculada', this.cuotaCalculada, true)
+            ]
             : [
-                this.crearResultado('Factor por Millón', this.factorPorMillon, true),
-                this.crearResultado('Monto Total', this.montoTotalCalculado, true),
-                this.crearResultado('Monto Desembolsable', this.montoDesembolsable, true)
-              ]
+              this.crearResultado('Factor por Millón', this.factorPorMillon, true),
+              this.crearResultado('Monto Total', this.montoTotalCalculado, true),
+              this.crearResultado('Monto Desembolsable', this.montoDesembolsable, true)
+            ]
         ]),
 
         // Detalle de costos
