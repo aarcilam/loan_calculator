@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Simulador de Crédito
  * Description: Shortcode para mostrar un simulador de crédito con opciones configurables
- * Version: 1.0
- * Author: Tu Nombre
+ * Version: 1.1
+ * Author: Andres Arcila
  */
 
 // Evitar acceso directo
