@@ -181,10 +181,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }).format(numero);
       },
       crearSlider(label, model, min, max, onChange, formatear = true) {
-        return h('div', { style: 'margin-bottom:1.5rem;' }, [
-          h('label', { style: 'display:block; margin-bottom:0.5rem; color:#555; font-weight:bold;' }, label),
-          h('div', { style: 'display:flex; align-items:center; gap:1rem;' }, [
-            h('span', { style: 'color:#666; font-size:0.9rem; min-width:80px;' },
+        return h('div', { class: 'slider-container' }, [
+          h('label', { class: 'slider-label' }, label),
+          h('div', { class: 'slider-controls' }, [
+            h('span', { class: 'slider-min' },
               formatear ? this.formatearMoneda(min) : `${min}`
             ),
             h('input', {
@@ -192,8 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
               min: min,
               max: max,
               value: this[model],
-              onInput: (e) => onChange(parseInt(e.target.value)),
-              style: 'flex:1; height:6px; background:#ddd; border-radius:3px; outline:none;'
+              onInput: (e) => onChange(parseInt(e.target.value))
             }),
             h('input', {
               type: 'text',
@@ -240,10 +239,9 @@ document.addEventListener('DOMContentLoaded', function () {
                   onChange(valorFinal);
                 }
               },
-              placeholder: formatear ? '$0' : '0',
-              style: 'width:150px; padding:0.5rem; border:1px solid #ddd; border-radius:4px; text-align:center; font-size:1rem;'
+              placeholder: formatear ? '$0' : '0'
             }),
-            h('span', { style: 'color:#666; font-size:0.9rem; min-width:80px;' },
+            h('span', { class: 'slider-max' },
               formatear ? this.formatearMoneda(max) : `${max}`
             )
           ])
@@ -251,10 +249,10 @@ document.addEventListener('DOMContentLoaded', function () {
       },
       crearResultado(label, valor, destacado = false) {
         return h('div', {
-          style: `display:flex; justify-content:space-between; align-items:center; padding:1rem; margin-bottom:0.5rem; border-radius:6px; ${destacado ? 'background:#e8f4f8; border:2px solid #528A93;' : 'background:#f0f4f8;'}`
+          class: `resultado ${destacado ? 'destacado' : ''}`
         }, [
-          h('span', { style: `font-weight:bold; ${destacado ? 'color:#24334B;' : 'color:#24334B;'}` }, label),
-          h('span', { style: `font-weight:bold; ${destacado ? 'color:#24334B;' : 'color:#24334B;'}` },
+          h('span', { class: 'label' }, label),
+          h('span', { class: 'valor' },
             typeof valor === 'number' ? this.formatearMoneda(valor) : valor
           )
         ]);
@@ -322,35 +320,30 @@ document.addEventListener('DOMContentLoaded', function () {
     },
     render() {
       return h('div', {
-        class: 'simulador-credito',
-        style: 'width:100%; margin:0 auto; padding:2rem; background:#f5f7fa; border-radius:12px; font-family:Arial,sans-serif;'
+        class: 'simulador-credito'
       }, [
         // Header
-        h('h1', {
-          style: 'color:#24334B; text-align:center; margin-bottom:0.5rem; font-size:2.5rem;'
-        }, 'Simulador de Crédito'),
-        h('p', {
-          style: 'text-align:center; color:#666; margin-bottom:2rem; font-size:1.1rem;'
-        }, 'Simule monto a cuota o cuota a monto en tiempo real'),
+        h('h1', {}, 'Simulador de Crédito'),
+        h('p', {}, 'Simule monto a cuota o cuota a monto en tiempo real'),
 
         // Selector de tipo de simulación
-        h('div', { style: 'background:white; padding:1.5rem; border-radius:8px; margin-bottom:1.5rem; text-align:center;' }, [
-          h('h3', { style: 'color:#333; margin-bottom:1rem;' }, 'Tipo de Simulación:'),
-          h('div', { style: 'display:flex; gap:1rem; justify-content:center;' }, [
+        h('div', { class: 'tipo-simulacion' }, [
+          h('h3', {}, 'Tipo de Simulación:'),
+          h('div', { class: 'botones' }, [
             h('button', {
               onClick: () => this.cambiarSimulacion('monto-a-cuota'),
-              style: `padding:0.75rem 1.5rem; border:none; border-radius:6px; font-size:1rem; font-weight:bold; cursor:pointer; ${this.tipoSimulacion === 'monto-a-cuota' ? 'background:#528A93; color:white;' : 'background:#e9ecef; color:#495057;'}`
+              class: this.tipoSimulacion === 'monto-a-cuota' ? 'activo' : ''
             }, 'MONTO A CUOTA'),
             h('button', {
               onClick: () => this.cambiarSimulacion('cuota-a-monto'),
-              style: `padding:0.75rem 1.5rem; border:none; border-radius:6px; font-size:1rem; font-weight:bold; cursor:pointer; ${this.tipoSimulacion === 'cuota-a-monto' ? 'background:#528A93; color:white;' : 'background:#e9ecef; color:#495057;'}`
+              class: this.tipoSimulacion === 'cuota-a-monto' ? 'activo' : ''
             }, 'CUOTA A MONTO')
           ])
         ]),
 
         // Parámetros de entrada
-        h('div', { style: 'background:white; padding:1.5rem; border-radius:8px; margin-bottom:1.5rem;' }, [
-          h('h3', { style: 'color:#333; margin-bottom:1rem;' }, 'Parámetros de Entrada:'),
+        h('div', { class: 'parametros' }, [
+          h('h3', {}, 'Parámetros de Entrada:'),
 
           this.tipoSimulacion === 'monto-a-cuota'
             ? this.crearSlider('Monto Desembolso *', 'montoDesembolso', this.montoMin, this.montoMax, this.actualizarMonto.bind(this))
@@ -360,8 +353,8 @@ document.addEventListener('DOMContentLoaded', function () {
         ]),
 
         // Resultados principales
-        h('div', { style: 'background:white; padding:1.5rem; border-radius:8px; margin-bottom:1.5rem;' }, [
-          h('h3', { style: 'color:#333; margin-bottom:1rem;' }, 'Resultados de la Simulación:'),
+        h('div', { class: 'resultados' }, [
+          h('h3', {}, 'Resultados de la Simulación:'),
 
           this.tipoSimulacion === 'monto-a-cuota'
             ? [
@@ -376,23 +369,22 @@ document.addEventListener('DOMContentLoaded', function () {
         ]),
 
         // Detalle de costos (solo visible si mostrarDetalles es true)
-        this.mostrarDetalles ? h('div', { style: 'background:white; padding:1.5rem; border-radius:8px; margin-bottom:1.5rem;' }, [
+        this.mostrarDetalles ? h('div', { class: 'acordeon' }, [
           h('div', {
-            style: 'display:flex; justify-content:space-between; align-items:center; cursor:pointer;',
+            class: 'acordeon-header',
             onClick: () => this.alternarDetalleCostos()
           }, [
-            h('h3', { style: 'color:#333; margin:0;' }, 'Detalle de Costos:'),
+            h('h3', {}, 'Detalle de Costos:'),
             h('span', {
-              style: 'font-size:1.5rem; color:#666; transition:transform 0.3s;',
-              class: this.detalleCostosVisible ? 'rotated' : ''
+              class: `acordeon-toggle ${this.detalleCostosVisible ? 'rotated' : ''}`
             }, this.detalleCostosVisible ? '-' : '+')
           ]),
 
           // Contenido del acordeón
           h('div', {
-            style: `overflow:hidden; transition:all 0.3s ease; ${this.detalleCostosVisible ? 'max-height:1000px; opacity:1;' : 'max-height:0; opacity:0;'}`
+            class: `acordeon-content ${this.detalleCostosVisible ? 'expanded' : 'collapsed'}`
           }, [
-            h('div', { style: 'display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1rem;' }, [
+            h('div', { class: 'detalles-grid' }, [
               h('div', [
                 this.crearResultado('Tasa de Interés', `${this.tasa}%`),
                 this.crearResultado('Seguro de Vida', this.formatearMoneda(this.seguroVida)),
@@ -412,48 +404,45 @@ document.addEventListener('DOMContentLoaded', function () {
         ]) : null,
 
         // Tabla de Amortización (solo visible en cuota a monto Y si mostrarDetalles es true)
-        (this.tipoSimulacion === 'cuota-a-monto' && this.mostrarDetalles) ? h('div', { style: 'background:white; padding:1.5rem; border-radius:8px;' }, [
+        (this.tipoSimulacion === 'cuota-a-monto' && this.mostrarDetalles) ? h('div', { class: 'acordeon' }, [
           h('div', {
-            style: 'display:flex; justify-content:space-between; align-items:center; cursor:pointer;',
+            class: 'acordeon-header',
             onClick: () => this.alternarTablaAmortizacion()
           }, [
-            h('h3', { style: 'color:#333; margin:0;' }, 'Tabla de Amortización:'),
+            h('h3', {}, 'Tabla de Amortización:'),
             h('span', {
-              style: 'font-size:1.5rem; color:#666; transition:transform 0.3s;',
-              class: this.tablaAmortizacionVisible ? 'rotated' : ''
+              class: `acordeon-toggle ${this.tablaAmortizacionVisible ? 'rotated' : ''}`
             }, this.tablaAmortizacionVisible ? '-' : '+')
           ]),
 
           // Contenido del acordeón
           h('div', {
-            style: `overflow:hidden; transition:all 0.3s ease; ${this.tablaAmortizacionVisible ? 'max-height:2000px; opacity:1;' : 'max-height:0; opacity:0;'}`
+            class: `acordeon-content ${this.tablaAmortizacionVisible ? 'expanded' : 'collapsed'}`
           }, [
-            h('div', { style: 'overflow-x:auto; margin-top:1rem;' }, [
-              h('table', {
-                style: 'width:100%; border-collapse:collapse; border:1px solid #ddd; font-size:0.9rem;'
-              }, [
+            h('div', { class: 'tabla-container' }, [
+                            h('table', {}, [
                 // Encabezados de la tabla
                 h('thead', [
-                  h('tr', { style: 'background:#e8f4f8;' }, [
-                                      h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#24334B;' }, 'ITEM'),
-                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#24334B;' }, 'CUOTA'),
-                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#24334B;' }, 'INTERES'),
-                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#24334B;' }, 'CAPITAL'),
-                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#24334B;' }, 'SEGURO DE VIDA'),
-                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:bold; color:#24334B;' }, 'APORTE'),
-                  h('th', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#24334B;' }, 'SALDO')
+                  h('tr', {}, [
+                    h('th', {}, 'ITEM'),
+                    h('th', {}, 'CUOTA'),
+                    h('th', {}, 'INTERES'),
+                    h('th', {}, 'CAPITAL'),
+                    h('th', {}, 'SEGURO DE VIDA'),
+                    h('th', {}, 'APORTE'),
+                    h('th', {}, 'SALDO')
                   ])
                 ]),
-                // Cuerpo de la tabla
+                                // Cuerpo de la tabla
                 h('tbody', this.generarFilasAmortizacion().map(fila => 
-                  h('tr', { style: 'border-bottom:1px solid #eee;' }, [
-                    h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:center; font-weight:bold; color:#666;' }, fila.item),
-                                      h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#528A93; font-weight:bold;' }, this.formatearMoneda(fila.cuota)),
-                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#24334B;' }, this.formatearMoneda(fila.interes)),
-                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#528A93;' }, this.formatearMoneda(fila.capital)),
-                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#24334B;' }, this.formatearMoneda(fila.seguroVida)),
-                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#528A93;' }, this.formatearMoneda(fila.aporte)),
-                  h('td', { style: 'padding:0.75rem; border:1px solid #ddd; text-align:right; color:#24334B; font-weight:bold;' }, this.formatearMoneda(fila.saldo))
+                  h('tr', {}, [
+                    h('td', {}, fila.item),
+                    h('td', { class: 'cuota' }, this.formatearMoneda(fila.cuota)),
+                    h('td', { class: 'interes' }, this.formatearMoneda(fila.interes)),
+                    h('td', { class: 'capital' }, this.formatearMoneda(fila.capital)),
+                    h('td', { class: 'seguro' }, this.formatearMoneda(fila.seguroVida)),
+                    h('td', { class: 'aporte' }, this.formatearMoneda(fila.aporte)),
+                    h('td', { class: 'saldo' }, this.formatearMoneda(fila.saldo))
                   ])
                 ))
               ])

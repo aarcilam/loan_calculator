@@ -1,69 +1,87 @@
-/* Estilos para el simulador de crédito */
-
-.simulador-credito input[type="text"] {
-  transition: all 0.3s ease;
-  border: 1px solid #ddd;
+/* Variables de color del simulador */
+:root {
+  --color-primary: #528A93;
+  --color-secondary: #24334B;
+  --color-background: #f5f7fa;
+  --color-white: #ffffff;
+  --color-gray-light: #f8f9fa;
+  --color-gray-medium: #e9ecef;
+  --color-gray-dark: #495057;
+  --color-text-primary: #333333;
+  --color-text-secondary: #666666;
+  --color-border: #dddddd;
+  --color-border-focus: #528A93;
+  --color-shadow: rgba(82, 138, 147, 0.2);
+  --color-hover: rgba(82, 138, 147, 0.1);
+  --color-success: #e8f4f8;
+  --color-success-border: #528A93;
+  --color-info: #f0f4f8;
+  --color-table-header: #e8f4f8;
+  --color-table-border: #dddddd;
+  --color-table-text: #666666;
 }
 
-.simulador-credito input[type="text"]:focus {
-  border-color: #528A93;
-  box-shadow: 0 0 0 2px rgba(82, 138, 147, 0.2);
-  outline: none;
+/* Estilos base del simulador */
+.simulador-credito {
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  background: var(--color-background);
+  border-radius: 12px;
+  font-family: Arial, sans-serif;
 }
 
-.simulador-credito input[type="text"]:hover {
-  border-color: #528A93;
+/* Header del simulador */
+.simulador-credito h1 {
+  color: var(--color-secondary);
+  text-align: center;
+  margin-bottom: 0.5rem;
+  font-size: 2.5rem;
 }
 
-/* Estilos para el slider */
-.simulador-credito input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  height: 6px;
-  background: #ddd;
-  border-radius: 3px;
-  outline: none;
-  transition: all 0.3s ease;
+.simulador-credito p {
+  text-align: center;
+  color: var(--color-text-secondary);
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
 }
 
-.simulador-credito input[type="range"]:hover {
-  background: #528A93;
+/* Selector de tipo de simulación */
+.simulador-credito .tipo-simulacion {
+  background: var(--color-white);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
 }
 
-.simulador-credito input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  background: #528A93;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.simulador-credito .tipo-simulacion h3 {
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
 }
 
-.simulador-credito input[type="range"]::-webkit-slider-thumb:hover {
-  background: #24334B;
-  transform: scale(1.1);
+.simulador-credito .tipo-simulacion .botones {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
 }
 
-.simulador-credito input[type="range"]::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  background: #528A93;
-  border-radius: 50%;
-  cursor: pointer;
-  border: none;
-  transition: all 0.3s ease;
-}
-
-.simulador-credito input[type="range"]::-moz-range-thumb:hover {
-  background: #24334B;
-  transform: scale(1.1);
-}
-
-/* Estilos para los botones */
+/* Botones de tipo de simulación */
 .simulador-credito button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
   transition: all 0.3s ease;
+  background: var(--color-gray-medium);
+  color: var(--color-gray-dark);
+}
+
+.simulador-credito button.activo {
+  background: var(--color-primary);
+  color: var(--color-white);
 }
 
 .simulador-credito button:hover {
@@ -71,42 +89,330 @@
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* Estilos para los acordeones */
-.simulador-credito .acordeon-header {
+/* Contenedor de parámetros */
+.simulador-credito .parametros {
+  background: var(--color-white);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.simulador-credito .parametros h3 {
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+}
+
+/* Sliders y controles */
+.simulador-credito .slider-container {
+  margin-bottom: 1.5rem;
+}
+
+.simulador-credito .slider-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-secondary);
+  font-weight: bold;
+}
+
+.simulador-credito .slider-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.simulador-credito .slider-min,
+.simulador-credito .slider-max {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  min-width: 80px;
+}
+
+/* Input range (slider) */
+.simulador-credito input[type="range"] {
+  flex: 1;
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 3px;
+  outline: none;
+  transition: all 0.3s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.simulador-credito input[type="range"]:hover {
+  background: var(--color-primary);
+}
+
+.simulador-credito input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--color-primary);
+  border-radius: 50%;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.simulador-credito .acordeon-header:hover {
-  background-color: rgba(82, 138, 147, 0.1);
+.simulador-credito input[type="range"]::-webkit-slider-thumb:hover {
+  background: var(--color-secondary);
+  transform: scale(1.1);
 }
 
-/* Animaciones para los acordeones */
-.simulador-credito .acordeon-content {
+.simulador-credito input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
   transition: all 0.3s ease;
 }
 
-/* Estilos para los resultados */
+.simulador-credito input[type="range"]::-moz-range-thumb:hover {
+  background: var(--color-secondary);
+  transform: scale(1.1);
+}
+
+/* Inputs de texto */
+.simulador-credito input[type="text"] {
+  width: 150px;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  text-align: center;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.simulador-credito input[type="text"]:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 2px var(--color-shadow);
+  outline: none;
+}
+
+.simulador-credito input[type="text"]:hover {
+  border-color: var(--color-primary);
+}
+
+/* Contenedor de resultados */
+.simulador-credito .resultados {
+  background: var(--color-white);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.simulador-credito .resultados h3 {
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+}
+
+/* Resultados individuales */
 .simulador-credito .resultado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 6px;
+  background: var(--color-info);
   transition: all 0.3s ease;
+}
+
+.simulador-credito .resultado.destacado {
+  background: var(--color-success);
+  border: 2px solid var(--color-success-border);
+}
+
+.simulador-credito .resultado .label,
+.simulador-credito .resultado .valor {
+  font-weight: bold;
+  color: var(--color-secondary);
 }
 
 .simulador-credito .resultado:hover {
   transform: translateX(5px);
 }
 
+/* Acordeones */
+.simulador-credito .acordeon {
+  background: var(--color-white);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.simulador-credito .acordeon-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.simulador-credito .acordeon-header:hover {
+  background-color: var(--color-hover);
+}
+
+.simulador-credito .acordeon-header h3 {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.simulador-credito .acordeon-toggle {
+  font-size: 1.5rem;
+  color: var(--color-text-secondary);
+  transition: transform 0.3s;
+}
+
+.simulador-credito .acordeon-toggle.rotated {
+  transform: rotate(45deg);
+}
+
+/* Contenido del acordeón */
+.simulador-credito .acordeon-content {
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.simulador-credito .acordeon-content.expanded {
+  max-height: 2000px;
+  opacity: 1;
+}
+
+.simulador-credito .acordeon-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+/* Grid de detalles */
+.simulador-credito .detalles-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Tabla de amortización */
+.simulador-credito .tabla-container {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+.simulador-credito table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--color-table-border);
+  font-size: 0.9rem;
+}
+
+.simulador-credito thead tr {
+  background: var(--color-table-header);
+}
+
+.simulador-credito th {
+  padding: 0.75rem;
+  border: 1px solid var(--color-table-border);
+  text-align: center;
+  font-weight: bold;
+  color: var(--color-secondary);
+}
+
+.simulador-credito td {
+  padding: 0.75rem;
+  border: 1px solid var(--color-table-border);
+  text-align: center;
+  font-weight: bold;
+  color: var(--color-table-text);
+}
+
+.simulador-credito td.cuota {
+  text-align: right;
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
+.simulador-credito td.interes {
+  text-align: right;
+  color: var(--color-secondary);
+}
+
+.simulador-credito td.capital {
+  text-align: right;
+  color: var(--color-primary);
+}
+
+.simulador-credito td.seguro {
+  text-align: right;
+  color: var(--color-secondary);
+}
+
+.simulador-credito td.aporte {
+  text-align: right;
+  color: var(--color-primary);
+}
+
+.simulador-credito td.saldo {
+  text-align: right;
+  color: var(--color-secondary);
+  font-weight: bold;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .simulador-credito {
-    padding: 1rem !important;
-  }
-  
-  .simulador-credito input[type="text"] {
-    width: 120px !important;
-    font-size: 0.9rem !important;
+    padding: 1rem;
   }
   
   .simulador-credito h1 {
-    font-size: 2rem !important;
+    font-size: 2rem;
+  }
+  
+  .simulador-credito .tipo-simulacion .botones {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .simulador-credito .detalles-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .simulador-credito input[type="text"] {
+    width: 120px;
+    font-size: 0.9rem;
+  }
+  
+  .simulador-credito .slider-controls {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .simulador-credito .slider-min,
+  .simulador-credito .slider-max {
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .simulador-credito {
+    padding: 0.5rem;
+  }
+  
+  .simulador-credito .acordeon,
+  .simulador-credito .parametros,
+  .simulador-credito .resultados {
+    padding: 1rem;
+  }
+  
+  .simulador-credito table {
+    font-size: 0.8rem;
+  }
+  
+  .simulador-credito th,
+  .simulador-credito td {
+    padding: 0.5rem;
   }
 }
