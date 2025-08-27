@@ -1,6 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
   const { createApp, h } = Vue;
 
+  // Obtener la variable del shortcode desde el DOM
+  const shortcodeElement = document.getElementById('loan-calculator');
+  const mostrarDetalles = shortcodeElement ? shortcodeElement.getAttribute('data-mostrar-detalles') !== 'false' : true;
+
   createApp({
     data() {
       return {
@@ -10,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Estados de visibilidad
         detalleCostosVisible: false,
         tablaAmortizacionVisible: false,
+        mostrarDetalles: mostrarDetalles, // Nueva variable para controlar la visibilidad
 
         // Valores de entrada (modificables por el cliente)
         montoDesembolso: 10000000,
@@ -28,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Límites
         montoMin: 1000000,
-        montoMax: 50000000,
+        montoMax: 80000000,
         cuotaMin: 50000,
         cuotaMax: 1000000,
         plazoMin: 12,
@@ -313,8 +318,8 @@ document.addEventListener('DOMContentLoaded', function () {
             ]
         ]),
 
-        // Detalle de costos
-        h('div', { style: 'background:white; padding:1.5rem; border-radius:8px; margin-bottom:1.5rem;' }, [
+        // Detalle de costos (solo visible si mostrarDetalles es true)
+        this.mostrarDetalles ? h('div', { style: 'background:white; padding:1.5rem; border-radius:8px; margin-bottom:1.5rem;' }, [
           h('div', {
             style: 'display:flex; justify-content:space-between; align-items:center; cursor:pointer;',
             onClick: () => this.alternarDetalleCostos()
@@ -347,10 +352,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             this.crearResultado('Total Costos al Frente', `${this.totalCostosAlFrente}%`)
           ])
-        ]),
+        ]) : null,
 
-        // Tabla de Amortización (solo visible en cuota a monto)
-        this.tipoSimulacion === 'cuota-a-monto' ? h('div', { style: 'background:white; padding:1.5rem; border-radius:8px;' }, [
+        // Tabla de Amortización (solo visible en cuota a monto Y si mostrarDetalles es true)
+        (this.tipoSimulacion === 'cuota-a-monto' && this.mostrarDetalles) ? h('div', { style: 'background:white; padding:1.5rem; border-radius:8px;' }, [
           h('div', {
             style: 'display:flex; justify-content:space-between; align-items:center; cursor:pointer;',
             onClick: () => this.alternarTablaAmortizacion()
