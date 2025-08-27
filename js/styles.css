@@ -1,3 +1,17 @@
+/**
+ * Simulador de Crédito - Estilos CSS
+ * Versión: 1.0
+ * Última actualización: 2024-12-19
+ * Cache Buster: 1734624000
+ * 
+ * Características:
+ * - Variables CSS para fácil personalización
+ * - Diseño responsive completo
+ * - Animaciones y transiciones suaves
+ * - Optimizado para dispositivos táctiles
+ * - Soporte para pantallas de alta densidad
+ */
+
 /* Variables de color del simulador */
 :root {
   --color-primary: #528A93;

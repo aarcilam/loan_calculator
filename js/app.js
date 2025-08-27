@@ -1,3 +1,16 @@
+/**
+ * Simulador de Crédito - Vue.js 3
+ * Versión: 1.0
+ * Última actualización: 2024-12-19
+ * Cache Buster: 1734624000
+ * 
+ * Características:
+ * - Simulación monto a cuota y cuota a monto
+ * - Máscaras de entrada para moneda
+ * - Acordeones expandibles
+ * - Diseño responsive
+ * - Variables CSS para fácil personalización
+ */
 document.addEventListener('DOMContentLoaded', function () {
   const { createApp, h } = Vue;
 
