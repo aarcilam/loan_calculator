@@ -1,0 +1,112 @@
+/* Estilos para el simulador de crédito */
+
+.simulador-credito input[type="text"] {
+  transition: all 0.3s ease;
+  border: 1px solid #ddd;
+}
+
+.simulador-credito input[type="text"]:focus {
+  border-color: #528A93;
+  box-shadow: 0 0 0 2px rgba(82, 138, 147, 0.2);
+  outline: none;
+}
+
+.simulador-credito input[type="text"]:hover {
+  border-color: #528A93;
+}
+
+/* Estilos para el slider */
+.simulador-credito input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: #ddd;
+  border-radius: 3px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.simulador-credito input[type="range"]:hover {
+  background: #528A93;
+}
+
+.simulador-credito input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #528A93;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.simulador-credito input[type="range"]::-webkit-slider-thumb:hover {
+  background: #24334B;
+  transform: scale(1.1);
+}
+
+.simulador-credito input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: #528A93;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.simulador-credito input[type="range"]::-moz-range-thumb:hover {
+  background: #24334B;
+  transform: scale(1.1);
+}
+
+/* Estilos para los botones */
+.simulador-credito button {
+  transition: all 0.3s ease;
+}
+
+.simulador-credito button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Estilos para los acordeones */
+.simulador-credito .acordeon-header {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.simulador-credito .acordeon-header:hover {
+  background-color: rgba(82, 138, 147, 0.1);
+}
+
+/* Animaciones para los acordeones */
+.simulador-credito .acordeon-content {
+  transition: all 0.3s ease;
+}
+
+/* Estilos para los resultados */
+.simulador-credito .resultado {
+  transition: all 0.3s ease;
+}
+
+.simulador-credito .resultado:hover {
+  transform: translateX(5px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .simulador-credito {
+    padding: 1rem !important;
+  }
+  
+  .simulador-credito input[type="text"] {
+    width: 120px !important;
+    font-size: 0.9rem !important;
+  }
+  
+  .simulador-credito h1 {
+    font-size: 2rem !important;
+  }
+}

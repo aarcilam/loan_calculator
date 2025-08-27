@@ -165,6 +165,21 @@ document.addEventListener('DOMContentLoaded', function () {
           minimumFractionDigits: 0
         }).format(numValor);
       },
+      limpiarFormatoMoneda(valor) {
+        // Remover símbolo de peso, comas, puntos y espacios
+        return valor.replace(/[$,.\s]/g, '');
+      },
+      aplicarMascaraMoneda(valor) {
+        // Aplicar formato de moneda colombiana
+        const numero = parseInt(valor);
+        if (isNaN(numero)) return '$0';
+        
+        return new Intl.NumberFormat('es-CO', {
+          style: 'currency',
+          currency: 'COP',
+          minimumFractionDigits: 0
+        }).format(numero);
+      },
       crearSlider(label, model, min, max, onChange, formatear = true) {
         return h('div', { style: 'margin-bottom:1.5rem;' }, [
           h('label', { style: 'display:block; margin-bottom:0.5rem; color:#555; font-weight:bold;' }, label),
@@ -181,9 +196,51 @@ document.addEventListener('DOMContentLoaded', function () {
               style: 'flex:1; height:6px; background:#ddd; border-radius:3px; outline:none;'
             }),
             h('input', {
-              type: 'number',
-              value: this[model],
-              onInput: (e) => onChange(parseInt(e.target.value)),
+              type: 'text',
+              value: formatear ? this.formatearMoneda(this[model]) : this[model],
+              onInput: (e) => {
+                let valor = e.target.value;
+                
+                if (formatear) {
+                  // Para campos de moneda: permitir solo números
+                  valor = valor.replace(/[^\d]/g, '');
+                  
+                  if (valor.length > 0) {
+                    const numero = parseInt(valor);
+                    if (!isNaN(numero)) {
+                      // Aplicar formato en tiempo real
+                      e.target.value = this.aplicarMascaraMoneda(numero);
+                      onChange(numero);
+                    }
+                  }
+                } else {
+                  // Para campos numéricos: permitir solo números
+                  valor = valor.replace(/[^\d]/g, '');
+                  onChange(parseInt(valor) || 0);
+                }
+              },
+              onFocus: (e) => {
+                if (formatear) {
+                  // Mostrar solo el número sin formato al hacer focus
+                  e.target.value = this[model];
+                  e.target.select();
+                }
+              },
+              onBlur: (e) => {
+                if (formatear) {
+                  // Al perder el focus, limpiar y aplicar formato final
+                  const valorLimpio = this.limpiarFormatoMoneda(e.target.value);
+                  const numero = parseInt(valorLimpio) || 0;
+                  
+                  // Aplicar límites min/max
+                  const valorFinal = Math.max(min, Math.min(max, numero));
+                  
+                  // Aplicar formato final
+                  e.target.value = this.aplicarMascaraMoneda(valorFinal);
+                  onChange(valorFinal);
+                }
+              },
+              placeholder: formatear ? '$0' : '0',
               style: 'width:150px; padding:0.5rem; border:1px solid #ddd; border-radius:4px; text-align:center; font-size:1rem;'
             }),
             h('span', { style: 'color:#666; font-size:0.9rem; min-width:80px;' },

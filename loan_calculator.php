@@ -15,6 +15,7 @@ if (!defined('ABSPATH')) {
 function enqueue_loan_calculator_assets() {
     wp_enqueue_script('vue-js', 'https://unpkg.com/vue@3/dist/vue.global.prod.js', array(), '3.0.0', true);
     wp_enqueue_script('loan-calculator', plugin_dir_url(__FILE__) . 'js/app.js', array('vue-js'), '1.0', true);
+    wp_enqueue_style('loan-calculator-styles', plugin_dir_url(__FILE__) . 'js/styles.css', array(), '1.0');
 }
 add_action('wp_enqueue_scripts', 'enqueue_loan_calculator_assets');
 
